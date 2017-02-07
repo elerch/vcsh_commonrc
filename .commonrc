@@ -45,9 +45,6 @@ hash vim 2>/dev/null && export EDITOR='vim'
 # Add the Go Workspace's bin subdirectory to PATH.
 [ "${GOPATH}x" != "x" ] && PATH=$PATH:$GOPATH/bin
 
-
-hash aws_completer 2>/dev/null && complete -C aws_completer aws
-
 if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
 
