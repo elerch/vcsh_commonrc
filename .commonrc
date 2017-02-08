@@ -57,11 +57,12 @@ fi
 
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
+user="${USER:-$(whoami)}"
 if hash gpg-agent 2> /dev/null; then
   # We have gpg-agent, great
   export GPG_TTY=$(tty)
   if [ -r "${HOME}/.gpg-agent-info" ] && \
-     [ -n "$(pgrep -U $USER gpg-agent)" ]; then
+     [ -n "$(pgrep -U $user gpg-agent)" ]; then
     . "${HOME}/.gpg-agent-info"
     export GPG_AGENT_INFO
     export SSH_AUTH_SOCK
@@ -80,26 +81,30 @@ else
   #
   [ -f /usr/local/bin/ssh-ask-keychain ] && \
     export SSH_ASKPASS=/usr/local/bin/ssh-ask-keychain
+  [ -f "/usr/lib/ssh/x11-ssh-askpass" ] && \
+    export SSH_ASKPASS="/usr/lib/ssh/x11-ssh-askpass"
 
-  if [ -f $HOME/.ssh-agent-pid ] && \
-    kill -0 `cat $HOME/.ssh-agent-pid` 2>/dev/null; then
-    SSH_AUTH_SOCK=`cat $HOME/.ssh-auth-sock`
-    SSH_AGENT_PID=`cat $HOME/.ssh-agent-pid`
+  if [ -r $HOME/.ssh-agent-pid ] && \
+    kill -0 $(cat $HOME/.ssh-agent-pid) 2>/dev/null; then
+    SSH_AUTH_SOCK=$(cat $HOME/.ssh-auth-sock)
+    SSH_AGENT_PID=$(cat $HOME/.ssh-agent-pid)
     export SSH_AUTH_SOCK SSH_AGENT_PID
   else
-    # Discover the running ssh-agent started by launchd
-    export SSH_AGENT_PID=$(pgrep -U $USER ssh-agent)
-    if [ -n "$SSH_AGENT_PID" ]; then
-      export SSH_AUTH_SOCK=\
-        $(lsof -U -a -p $SSH_AGENT_PID -F n | grep '^n/' | cut -c2-)
-      echo "$SSH_AUTH_SOCK" > ${HOME}/.ssh-auth-sock
-      echo "$SSH_AGENT_PID" > ${HOME}/.ssh-agent-pid
-      #else
-      # echo "No running ssh-agent found.  Check your launchd service."
-    fi
+    # Discover the running ssh-agent
+    export SSH_AGENT_PID=$(pgrep -U $user ssh-agent)
+    [ ! -n "$SSH_AGENT_PID" ] && hash ssh-agent 2>/dev/null && \
+      eval $(ssh-agent -s) > /dev/null
+
+    # lsof is less fragile but might not be installed
+    hash lsof 2>/dev/null &&
+      { export SSH_AUTH_SOCK=$(lsof -U -a -p $SSH_AGENT_PID -F n | grep '^n/' | cut -c2-); } || \
+      { export SSH_AUTH_SOCK=$(ls -lt /tmp/ssh-*/agent.* 2> /dev/null | head -n 1 | grep $user | awk '{print $9}'); }
+    echo "$SSH_AUTH_SOCK" > ${HOME}/.ssh-auth-sock
+    echo "$SSH_AGENT_PID" > ${HOME}/.ssh-agent-pid
 
     # Add all the local keys, getting the passphrase from keychain,
     # helped by the $SSH_ASKPASS script.
-    ssh-add < /dev/null 2>/dev/null
+    ssh-add -l > /dev/null || \
+      alias ssh='ssh-add -l > /dev/null || ssh-add && unalias ssh ; ssh'
   fi
 fi # SSH section if gpg-agent not available
