@@ -72,7 +72,7 @@ if hash gpg-agent 2> /dev/null; then
     export SSH_AUTH_SOCK
     export SSH_AGENT_PID
   else
-    eval $(gpg-agent --daemon --write-env-file ${HOME}/.gpg-agent-info)
+    eval $(gpg-agent --daemon --write-env-file ${HOME}/.gpg-agent-info 2> /dev/null)
   fi
 else
   # Fallback to SSH
