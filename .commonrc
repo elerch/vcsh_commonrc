@@ -55,6 +55,10 @@ if [ -d ~/.nvm ]; then
   alias npm='unalias node ; unalias npm ; nvm use default ; npm $@'
 fi
 
+# The rest is crazy complex, somewhat fragile and only matters if
+# you want agent stuff
+hash gpg-agent 2> /dev/null || hash ssh-agent 2>/dev/null || return;
+
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
 user="${USER:-$(whoami)}"
