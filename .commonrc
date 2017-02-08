@@ -57,11 +57,11 @@ fi
 
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
-if [ hash gpg-agent 2> /dev/null ]; then
+if hash gpg-agent 2> /dev/null; then
   # We have gpg-agent, great
   export GPG_TTY=$(tty)
-  if [ -f "${HOME}/.gpg-agent-info" && \
-     [ -n "$(pgrep -U $USER gpg-agent)" ] ]; then
+  if [ -r "${HOME}/.gpg-agent-info" ] && \
+     [ -n "$(pgrep -U $USER gpg-agent)" ]; then
     . "${HOME}/.gpg-agent-info"
     export GPG_AGENT_INFO
     export SSH_AUTH_SOCK
