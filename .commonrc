@@ -49,7 +49,10 @@ if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
 
   # See https://github.com/creationix/nvm/issues/539#issuecomment-245791291
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" --no-use # This loads nvm
+  # This loads nvm if installed via curl with directions from github
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" --no-use
+  # load from homebrew (without using brew --prefix nvm)
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh" --no-use
 
   alias node='unalias node ; unalias npm ; nvm use default ; node $@'
   alias npm='unalias node ; unalias npm ; nvm use default ; npm $@'
