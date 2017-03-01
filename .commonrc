@@ -17,6 +17,7 @@ unset file
 ! echo $PATH |fgrep /usr/local/bin >/dev/null && \
   PATH=/usr/local/bin:$PATH
 ! echo $PATH |fgrep /usr/local/sbin >/dev/null && \
+
   PATH=/usr/local/sbin:$PATH
 ! echo $PATH |fgrep $HOME/bin >/dev/null && \
   PATH=$HOME/bin:$PATH
@@ -30,6 +31,9 @@ fi
 # Set the default text editor.
 export EDITOR='vi'
 hash vim 2>/dev/null && export EDITOR='vim'
+
+[ $PS2 = "%_> " ] && export PS2="%_⚡ "
+
 #hash subl 2>/dev/null && export EDITOR='subl -w' # sublime
 
 # Source virtualenvwrapper.sh script
