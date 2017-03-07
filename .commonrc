@@ -14,18 +14,16 @@ unset file
   { [ -r ~/.bash_prompt ] && source ~/.bash_prompt; }
 
 # Add ~/bin:/usr/local/sbin:/usr/local/bin to path if they're not there
-! echo $PATH |fgrep /usr/local/bin >/dev/null && \
+! echo $PATH |grep -Fq /usr/local/bin && \
   PATH=/usr/local/bin:$PATH
-! echo $PATH |fgrep /usr/local/sbin >/dev/null && \
-
+! echo $PATH |grep -Fq /usr/local/sbin && \
   PATH=/usr/local/sbin:$PATH
-! echo $PATH |fgrep $HOME/bin >/dev/null && \
-  PATH=$HOME/bin:$PATH
 
 if hash brew 2>/dev/null; then
   # brew --prefix is slow
   #PATH=$(brew --prefix coreutils)/libexec/gnubin:$PATH
-  PATH=/usr/local/opt/coreutils/libexec/gnubin:$PATH
+  ! echo $PATH |grep -Fq /usr/local/opt/coreutils/libexec/gnubin && \
+    PATH=/usr/local/opt/coreutils/libexec/gnubin:$PATH
 fi
 
 # Set the default text editor.
@@ -34,20 +32,17 @@ hash vim 2>/dev/null && export EDITOR='vim'
 
 [ $PS2 = "%_> " ] && export PS2="%_⚡ "
 
-#hash subl 2>/dev/null && export EDITOR='subl -w' # sublime
-
-# Source virtualenvwrapper.sh script
-#[ -r /usr/local/bin/virtualenvwrapper.sh ] && \
-#  source /usr/local/bin/virtualenvwrapper.sh
-# This will be handled by .functions
-# See http://blog.n01se.net/agriffis-n01se-net-blog-dynamic-virtualenvwrapper-.html
-
 # Set GOPATH environment variable to the Go lang workspace.
 [ -d $HOME/Workspace/go-workspace ] && \
   export GOPATH=$HOME/Workspace/go-workspace
 
 # Add the Go Workspace's bin subdirectory to PATH.
-[ "${GOPATH}x" != "x" ] && PATH=$PATH:$GOPATH/bin
+[ "${GOPATH}x" != "x" ] && \
+  ! echo $PATH |grep -Fq $GOPATH/bin && \
+  PATH=$PATH:$GOPATH/bin
+
+! echo $PATH |grep -Fq $HOME/bin && \
+  PATH=$HOME/bin:$PATH
 
 if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
