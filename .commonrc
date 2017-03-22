@@ -6,6 +6,9 @@ for file in ~/.{extra,exports,aliases,functions,secrets}; do
 done
 unset file
 
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+
 [[ $- = *i* ]] && \
   { [ -r ~/.liquidprompt/liquidprompt ] && \
     source ~/.liquidprompt/liquidprompt; } || \
