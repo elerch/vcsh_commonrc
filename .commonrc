@@ -60,6 +60,16 @@ if [ -d ~/.nvm ]; then
   alias npm='unalias node ; unalias npm ; nvm use default ; npm $@'
 fi
 
+# Syntax highlighting for less. Looking at the two common
+# install paths should be slightly faster than using which
+[ -r /usr/local/bin/src-hilite-lesspipe.sh ] && \
+  LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s" && \
+  LESS=" -R "
+
+[ -r /usr/bin/src-hilite-lesspipe.sh ] && \
+  LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s" && \
+  LESS=" -R "
+
 # The rest is crazy complex, somewhat fragile and only matters if
 # you want agent stuff
 hash gpg-agent 2> /dev/null || hash ssh-agent 2>/dev/null || return;
