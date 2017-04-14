@@ -47,6 +47,9 @@ hash vim 2>/dev/null && export EDITOR='vim'
 ! echo $PATH |grep -Fq $HOME/bin && \
   PATH=$HOME/bin:$PATH
 
+[ -r $HOME/.dircolors ] && hash dircolors 2>/dev/null && \
+  eval $(dircolors -b $HOME/.dircolors)
+
 if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
 
