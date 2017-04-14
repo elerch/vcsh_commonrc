@@ -63,12 +63,12 @@ fi
 # Syntax highlighting for less. Looking at the two common
 # install paths should be slightly faster than using which
 [ -r /usr/local/bin/src-hilite-lesspipe.sh ] && \
-  LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s" && \
-  LESS=" -R "
+  export LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s" && \
+  export LESS=" -R "
 
 [ -r /usr/bin/src-hilite-lesspipe.sh ] && \
-  LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s" && \
-  LESS=" -R "
+  export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s" && \
+  export LESS=" -R "
 
 # The rest is crazy complex, somewhat fragile and only matters if
 # you want agent stuff
