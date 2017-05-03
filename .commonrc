@@ -127,3 +127,7 @@ else
       alias ssh='ssh-add -l > /dev/null || ssh-add && unalias ssh ; ssh'
   fi
 fi # SSH section if gpg-agent not available
+
+# Must be performed last
+[ -r ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh ] && \
+  source ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh
