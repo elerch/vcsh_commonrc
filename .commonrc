@@ -47,6 +47,9 @@ hash vim 2>/dev/null && export EDITOR='vim'
 ! echo $PATH |grep -Fq $HOME/bin && \
   PATH=$HOME/bin:$PATH
 
+[ -r $HOME/.LS_COLORS ] && [ ! -r $HOME/.dircolors ] && \
+  ln -s $HOME/.LS_COLORS/LS_COLORS $HOME/.dircolors
+
 [ -r $HOME/.dircolors ] && hash dircolors 2>/dev/null && \
   eval $(dircolors -b $HOME/.dircolors)
 
