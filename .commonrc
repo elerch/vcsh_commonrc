@@ -83,14 +83,11 @@ user="${USER:-$(whoami)}"
 if hash gpg-agent 2> /dev/null; then
   # We have gpg-agent, great
   export GPG_TTY=$(tty)
-  if [ -r "${HOME}/.gpg-agent-info" ] && \
-     [ -n "$(pgrep -U $user gpg-agent)" ]; then
-    . "${HOME}/.gpg-agent-info"
-    export GPG_AGENT_INFO
-    export SSH_AUTH_SOCK
-    export SSH_AGENT_PID
-  else
-    eval $(gpg-agent --daemon --write-env-file ${HOME}/.gpg-agent-info 2> /dev/null)
+  if [ -z "$(pgrep -U $user gpg-agent)" ]; then
+    eval $(gpg-agent --daemon --enable-ssh-support 2> /dev/null)
+  fi
+  if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
   fi
 else
   # Fallback to SSH
