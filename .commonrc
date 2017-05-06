@@ -53,9 +53,6 @@ hash vim 2>/dev/null && export EDITOR='vim'
 [ -r $HOME/.dircolors ] && hash dircolors 2>/dev/null && \
   eval $(dircolors -b $HOME/.dircolors)
 
-[ -r $HOME/.zsh-autosuggestions/zsh-autosuggestions.zsh ] && \
-  source $HOME/.zsh-autosuggestions/zsh-autosuggestions.zsh
-
 if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
 
