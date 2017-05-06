@@ -76,10 +76,6 @@ fi
   export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s" && \
   export LESS=" -R "
 
-# The rest is crazy complex, somewhat fragile and only matters if
-# you want agent stuff
-hash gpg-agent 2> /dev/null || hash ssh-agent 2>/dev/null || return;
-
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
 user="${USER:-$(whoami)}"
@@ -92,7 +88,9 @@ if hash gpg-agent 2> /dev/null; then
   if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
   fi
-else
+fi
+
+if [ -z "$GPG_TTY" ] &&  hash ssh-agent 2> /dev/null; then
   # Fallback to SSH
   #
   # SSH agent stuff might need to be added. See
