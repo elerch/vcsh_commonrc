@@ -32,6 +32,7 @@ fi
 # Set the default text editor.
 export EDITOR='vi'
 hash vim 2>/dev/null && export EDITOR='vim'
+hash st 2>/dev/null && export TERMINAL='st'
 
 [ $PS2 = "%_> " ] && export PS2="%_⚡ "
 
