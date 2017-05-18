@@ -77,6 +77,11 @@ fi
   export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s" && \
   export LESS=" -R "
 
+# Ubuntu
+[ -r /usr/share/source-highlight/src-hilite-lesspipe.sh ] && \
+  export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s" && \
+  export LESS=" -R "
+
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
 user="${USER:-$(whoami)}"
