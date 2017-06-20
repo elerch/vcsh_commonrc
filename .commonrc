@@ -16,6 +16,11 @@ export LC_ALL="en_US.UTF-8"
     source ~/liquidprompt/liquidprompt;} ||
   { [ -r ~/.bash_prompt ] && source ~/.bash_prompt; }
 
+# Add cargo bin for rustup if it exists
+[ -r $HOME/.cargo/bin ] &&
+  ! echo $PATH |grep -Fq $HOME/.cargo/bin && \
+  PATH="$HOME/.cargo/bin:$PATH"
+
 # Add ~/bin:/usr/local/sbin:/usr/local/bin to path if they're not there
 ! echo $PATH |grep -Fq /usr/local/bin && \
   PATH=/usr/local/bin:$PATH
