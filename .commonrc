@@ -16,6 +16,9 @@ export LC_ALL="en_US.UTF-8"
     source ~/liquidprompt/liquidprompt;} ||
   { [ -r ~/.bash_prompt ] && source ~/.bash_prompt; }
 
+########################################################################
+# Calculate path
+########################################################################
 # Add ~/bin:/usr/local/sbin:/usr/local/bin to path if they're not there
 ! echo $PATH |grep -Fq /usr/local/bin && \
   PATH=/usr/local/bin:$PATH
@@ -29,13 +32,6 @@ if hash brew 2>/dev/null; then
     PATH=/usr/local/opt/coreutils/libexec/gnubin:$PATH
 fi
 
-# Set the default text editor.
-export EDITOR='vi'
-hash vim 2>/dev/null && export EDITOR='vim'
-hash st 2>/dev/null && export TERMINAL='st'
-
-[ $PS2 = "%_> " ] && export PS2="%_⚡ "
-
 # Set GOPATH environment variable to the Go lang workspace.
 [ -d $HOME/Workspace/go-workspace ] && \
   export GOPATH=$HOME/Workspace/go-workspace
@@ -45,8 +41,29 @@ hash st 2>/dev/null && export TERMINAL='st'
   ! echo $PATH |grep -Fq $GOPATH/bin && \
   PATH=$PATH:$GOPATH/bin
 
+# Python pip install --user
+[ -r $HOME/.local/bin ] && \
+  ! echo $PATH |grep -Fq $HOME/.local/bin && \
+  PATH="$HOME/.local/bin:$PATH"
+
+# Cargo (Rust)
+[ -r $HOME/.cargo/bin ] && \
+  ! echo $PATH |grep -Fq $HOME/.cargo/bin && \
+  PATH="$HOME/.cargo/bin:$PATH"
+
+# home/bin needs to take precedence over everything
 ! echo $PATH |grep -Fq $HOME/bin && \
   PATH=$HOME/bin:$PATH
+########################################################################
+# END: Calculate path
+########################################################################
+
+# Set the default text editor.
+export EDITOR='vi'
+hash vim 2>/dev/null && export EDITOR='vim'
+hash st 2>/dev/null && export TERMINAL='st'
+
+[ $PS2 = "%_> " ] && export PS2="%_⚡ "
 
 [ -r $HOME/.LS_COLORS ] && [ ! -r $HOME/.dircolors ] && \
   ln -s $HOME/.LS_COLORS/LS_COLORS $HOME/.dircolors
