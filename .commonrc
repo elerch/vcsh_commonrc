@@ -41,10 +41,19 @@ fi
   ! echo $PATH |grep -Fq $GOPATH/bin && \
   PATH=$PATH:$GOPATH/bin
 
-# Python pip install --user
+# Python pip install --user (linux)
 [ -r $HOME/.local/bin ] && \
   ! echo $PATH |grep -Fq $HOME/.local/bin && \
   PATH="$HOME/.local/bin:$PATH"
+
+# Python pip install --user (macos): https://stackoverflow.com/a/7143496/113225
+if [ -r $HOME/Library/Python ]; then
+  for version in $(ls $HOME/Library/Python/); do
+    [ -r $HOME/Library/Python/$version/bin ] && \
+      ! echo $PATH |grep -Fq $HOME/Library/Python/$version/bin && \
+      PATH="$HOME/Library/Python/$version/bin:$PATH"
+  done
+fi
 
 # Cargo (Rust)
 [ -r $HOME/.cargo/bin ] && \
