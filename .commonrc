@@ -180,6 +180,9 @@ if [ -z "$GPG_TTY" ] &&  hash ssh-agent 2> /dev/null; then
     alias ssh='ssh-add -l > /dev/null || ssh-add && unalias ssh ; ssh'
 fi # SSH section if gpg-agent not available
 
+# Allow Ctrl-S for forward search at the expense of losing terminal stop
+stty stop ''
+
 # Must be performed last
 [ -r ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh ] && \
   source ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh
