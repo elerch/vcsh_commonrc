@@ -60,6 +60,15 @@ fi
   ! echo $PATH |grep -Fq $HOME/.cargo/bin && \
   PATH="$HOME/.cargo/bin:$PATH"
 
+# Ruby
+if [ -r $HOME/.gem/ruby ]; then
+  for version in $(ls $HOME/.gem/ruby/); do
+    [ -r $HOME/.gem/ruby/${version}/bin ] && \
+      ! echo $PATH |grep -Fq $HOME/.gem/ruby/${version}/bin && \
+      PATH="$HOME/.gem/ruby/${version}/bin:$PATH"
+  done
+fi
+
 # home/bin needs to take precedence over everything
 ! echo $PATH |grep -Fq $HOME/bin && \
   PATH=$HOME/bin:$PATH
