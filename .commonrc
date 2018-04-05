@@ -1,8 +1,24 @@
+# A few utility functions
+command_exists () {
+  # https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
+  # https://unix.stackexchange.com/questions/86012/what-is-the-purpose-of-the-hash-command
+  command -v "$1" > /dev/null 2>&1
+  return $?
+}
+try_source () {
+  # shellcheck source=/dev/null
+  [ -r "$1" ] && . "$1"
+  return $?
+}
+try_prepend_path () {
+  [ -d "$1" ] && ! echo "$PATH" | grep -Fq "$1" && PATH="$1":"$PATH"
+  return $?
+}
 # Load our dotfiles like ~/.bash_prompt, etc.
 #   ~/.extra can be used for settings you don't want to commit,
 #   Use it to configure your PATH, thus it being first in line.
-for file in ~/.{extra,exports,aliases,functions,secrets,lambdash}; do
-    [ -r "$file" ] && source "$file"
+for file in extra exports aliases functions secrets lambdash; do
+    try_source "$HOME"/"$file"
 done
 unset file
 
@@ -10,84 +26,67 @@ export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
 [[ $- = *i* ]] && \
-  { [ -r ~/.liquidprompt/liquidprompt ] && \
-    source ~/.liquidprompt/liquidprompt; } || \
-  { [ -r ~/liquidprompt/liquidprompt ] && \
-    source ~/liquidprompt/liquidprompt;} ||
-  { [ -r ~/.bash_prompt ] && source ~/.bash_prompt; }
+  try_source "$HOME"/.liquidprompt/liquidprompt || \
+  try_source "$HOME"/liquidprompt/liquidprompt || \
+  try_source "$HOME"/.bash_prompt
 
 ########################################################################
 # Calculate path
 ########################################################################
 # Add ~/bin:/usr/local/sbin:/usr/local/bin to path if they're not there
-! echo $PATH |grep -Fq /usr/local/bin && \
-  PATH=/usr/local/bin:$PATH
-! echo $PATH |grep -Fq /usr/local/sbin && \
-  PATH=/usr/local/sbin:$PATH
-
-if hash brew 2>/dev/null; then
-  # brew --prefix is slow
-  #PATH=$(brew --prefix coreutils)/libexec/gnubin:$PATH
-  ! echo $PATH |grep -Fq /usr/local/opt/coreutils/libexec/gnubin && \
-    PATH=/usr/local/opt/coreutils/libexec/gnubin:$PATH
-fi
+for pathprefix in \
+  /usr/local/bin \
+  /usr/local/sbin \
+  /usr/local/opt/coreutils/libexec/gnubin \
+  "$HOME"/.local/bin \
+  "$HOME"/.cargo/bin \
+  ; do
+    try_prepend_path "$pathprefix"
+done
+unset pathprefix
 
 # Set GOPATH environment variable to the Go lang workspace.
-[ -d $HOME/Workspace/go-workspace ] && \
-  export GOPATH=$HOME/Workspace/go-workspace
+[ -d "$HOME"/Workspace/go-workspace ] && \
+  export GOPATH="$HOME"/Workspace/go-workspace
 
 # Add the Go Workspace's bin subdirectory to PATH.
 [ "${GOPATH}x" != "x" ] && \
-  ! echo $PATH |grep -Fq $GOPATH/bin && \
-  PATH=$PATH:$GOPATH/bin
-
-# Python pip install --user (linux)
-[ -r $HOME/.local/bin ] && \
-  ! echo $PATH |grep -Fq $HOME/.local/bin && \
-  PATH="$HOME/.local/bin:$PATH"
+  try_prepend_path "$GOPATH"/bin
 
 # Python pip install --user (macos): https://stackoverflow.com/a/7143496/113225
-if [ -r $HOME/Library/Python ]; then
-  for version in $(ls $HOME/Library/Python/); do
-    [ -r $HOME/Library/Python/$version/bin ] && \
-      ! echo $PATH |grep -Fq $HOME/Library/Python/$version/bin && \
-      PATH="$HOME/Library/Python/$version/bin:$PATH"
+if [ -r "$HOME"/Library/Python ]; then
+  for version in "$HOME"/Library/Python/*; do
+    try_prepend_path "$version"
   done
+  unset version
 fi
 
-# Cargo (Rust)
-[ -r $HOME/.cargo/bin ] && \
-  ! echo $PATH |grep -Fq $HOME/.cargo/bin && \
-  PATH="$HOME/.cargo/bin:$PATH"
-
 # Ruby
-if [ -r $HOME/.gem/ruby ]; then
-  for version in $(ls $HOME/.gem/ruby/); do
-    [ -r $HOME/.gem/ruby/${version}/bin ] && \
-      ! echo $PATH |grep -Fq $HOME/.gem/ruby/${version}/bin && \
-      PATH="$HOME/.gem/ruby/${version}/bin:$PATH"
+if [ -r "$HOME"/.gem/ruby ]; then
+  for version in "$HOME"/.gem/ruby/*; do
+    try_prepend_path "$version"
   done
+  unset version
 fi
 
 # home/bin needs to take precedence over everything
-! echo $PATH |grep -Fq $HOME/bin && \
-  PATH=$HOME/bin:$PATH
+try_prepend_path "$HOME"/bin
 ########################################################################
 # END: Calculate path
 ########################################################################
 
 # Set the default text editor.
 export EDITOR='vi'
-hash vim 2>/dev/null && export EDITOR='vim'
-hash st 2>/dev/null && export TERMINAL='st'
+command_exists vim && export EDITOR='vim'
+command_exists st && export TERMINAL='st'
 
-[ $PS2 = "%_> " ] && export PS2="%_⚡ "
+[ "$PS2" = "%_> " ] && export PS2="%_⚡ "
 
-[ -r $HOME/.LS_COLORS ] && [ ! -r $HOME/.dircolors ] && \
-  ln -s $HOME/.LS_COLORS/LS_COLORS $HOME/.dircolors
+[ -r "$HOME"/.LS_COLORS ] && [ ! -r "$HOME"/.dircolors ] && \
+  ln -s "$HOME"/.LS_COLORS/LS_COLORS "$HOME"/.dircolors
 
-[ -r $HOME/.dircolors ] && hash dircolors 2>/dev/null && \
-  eval $(dircolors -b $HOME/.dircolors)
+[ -r "$HOME"/.dircolors ] && command_exists dircolors && \
+  eval $(dircolors -b "$HOME"/.dircolors)
 
 if [ -d ~/.nvm ]; then
   export NVM_DIR=~/.nvm
@@ -120,10 +119,10 @@ fi
 # Check for GPG, and if installed, use it
 # Based on https://gist.github.com/bmhatfield/cc21ec0a3a2df963bffa3c1f884b676b
 user="${USER:-$(whoami)}"
-if hash gpg-agent 2> /dev/null; then
+if command_exists gpg-agent; then
   # We have gpg-agent, great
   export GPG_TTY=$(tty)
-  if [ -z "$(pgrep -U $user gpg-agent)" ]; then
+  if [ -z "$(pgrep -U "$user" gpg-agent)" ]; then
     eval $(gpg-agent --daemon --enable-ssh-support 2> /dev/null)
   fi
   if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
@@ -131,7 +130,7 @@ if hash gpg-agent 2> /dev/null; then
   fi
 fi
 
-if [ -z "$GPG_TTY" ] &&  hash ssh-agent 2> /dev/null; then
+if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
   # Fallback to SSH
   #
   # SSH agent stuff might need to be added. See
@@ -178,7 +177,7 @@ if [ -z "$GPG_TTY" ] &&  hash ssh-agent 2> /dev/null; then
   else
     # easy case - crank an agent up. It's still possible, though unlikely
     # we don't have ssh-agent. We'll save the socket info for later
-    hash ssh-agent 2>/dev/null && \
+    command_exists ssh-agent && \
       ssh-agent -s > ${HOME}/.ssh-agent-info && \
       eval $(cat ${HOME}/.ssh-agent-info) > /dev/null
   fi
@@ -194,4 +193,4 @@ stty stop ''
 
 # Must be performed last
 [ -r ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh ] && \
-  source ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh
+  . ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh
