@@ -18,7 +18,7 @@ try_prepend_path () {
 #   ~/.extra can be used for settings you don't want to commit,
 #   Use it to configure your PATH, thus it being first in line.
 for file in extra exports aliases functions secrets lambdash; do
-    try_source "$HOME"/"$file"
+    try_source "$HOME"/."$file"
 done
 unset file
 
