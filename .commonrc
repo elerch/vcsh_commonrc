@@ -190,7 +190,7 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
 fi # SSH section if gpg-agent not available
 
 # Allow Ctrl-S for forward search at the expense of losing terminal stop
-stty stop ''
+[[ $- = *i* ]] && stty stop ''
 
 # Must be performed last
 [ -r ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh ] && \
