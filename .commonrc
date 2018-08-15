@@ -129,7 +129,7 @@ if command_exists gpg-agent; then
   if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
     # update tty for SSH pinentry
-    gpg-connect-agent updatestartuptty /bye > /dev/null
+    gpg-connect-agent updatestartuptty /bye > /dev/null 2>&1
   fi
 fi
 
