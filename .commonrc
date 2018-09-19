@@ -55,6 +55,9 @@ unset pathprefix
 [ "${GOPATH}x" != "x" ] && \
   try_prepend_path "$GOPATH"/bin
 
+# Gopath defaults to $HOME/go
+try_prepend_path "$HOME"/go/bin
+
 # Python pip install --user (macos): https://stackoverflow.com/a/7143496/113225
 if [ -r "$HOME"/Library/Python ]; then
   for version in "$HOME"/Library/Python/*; do
