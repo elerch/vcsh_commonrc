@@ -41,6 +41,7 @@ for pathprefix in \
   /usr/local/sbin \
   /usr/local/opt/coreutils/libexec/gnubin \
   "$HOME"/.local/bin \
+  "$HOME"/.local/go/bin \
   "$HOME"/.cargo/bin \
   ; do
     try_prepend_path "$pathprefix"
