@@ -14,22 +14,10 @@ try_prepend_path () {
   [ -d "$1" ] && ! echo "$PATH" | grep -Fq "$1" && PATH="$1":"$PATH"
   return $?
 }
-# Load our dotfiles like ~/.bash_prompt, etc.
-#   ~/.extra can be used for settings you don't want to commit,
-#   Use it to configure your PATH, thus it being first in line.
-for file in extra exports aliases functions secrets lambdash; do
-    try_source "$HOME"/."$file"
-done
-unset file
 
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 export AWS_VAULT_BACKEND=secret-service
-
-[[ $- = *i* ]] && \
-  try_source "$HOME"/.liquidprompt/liquidprompt || \
-  try_source "$HOME"/liquidprompt/liquidprompt || \
-  try_source "$HOME"/.bash_prompt
 
 ########################################################################
 # Calculate path
@@ -80,6 +68,23 @@ try_prepend_path "$HOME"/bin
 ########################################################################
 # END: Calculate path
 ########################################################################
+
+# Load our dotfiles like ~/.bash_prompt, etc.
+#   ~/.extra can be used for settings you don't want to commit,
+#   Use it to configure your PATH, thus it being first in line.
+#   .extra should be the last thing that mucks with PATH. The
+#   other sourced files are done after PATH calculation in case
+#   they are dependent on commands
+for file in extra exports aliases functions secrets lambdash; do
+    try_source "$HOME"/."$file"
+done
+unset file
+
+# Calculate prompt
+[[ $- = *i* ]] && \
+  try_source "$HOME"/.liquidprompt/liquidprompt || \
+  try_source "$HOME"/liquidprompt/liquidprompt || \
+  try_source "$HOME"/.bash_prompt
 
 # Set the default text editor.
 export EDITOR='vi'
