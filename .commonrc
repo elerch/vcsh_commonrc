@@ -18,6 +18,7 @@ try_prepend_path () {
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 export AWS_VAULT_BACKEND=secret-service
+export DOTNET_CLI_TELEMETRY_OPTOUT=1 # Really? We now have to do this???
 
 ########################################################################
 # Calculate path
@@ -31,6 +32,7 @@ for pathprefix in \
   "$HOME"/.local/bin \
   "$HOME"/.local/go/bin \
   "$HOME"/.local/dotnet \
+  "$HOME"/.dotnet/tools \
   "$HOME"/.cargo/bin \
   ; do
     try_prepend_path "$pathprefix"
