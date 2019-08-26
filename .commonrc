@@ -6,7 +6,6 @@ command_exists () {
   return $?
 }
 try_source () {
-  # shellcheck source=/dev/null
   [ -r "$1" ] && . "$1"
   return $?
 }
@@ -82,12 +81,22 @@ for file in extra exports aliases functions secrets lambdash; do
     try_source "$HOME"/."$file"
 done
 unset file
+# Determine running shell as bash/zsh/other
+if test -n "${BASH_VERSION-}" -a -n "$PS1" ; then
+  runningshell=bash
+elif test -n "${ZSH_VERSION-}" ; then
+  runningshell=zsh
+else
+  runningshell=other
+fi
 
 # Calculate prompt
-[[ $- = *i* ]] && \
+echo $- | grep -qv i
+interactive=$?
+[ $interactive -eq 1 ] && [ $runningshell != other ] && { \
   try_source "$HOME"/.liquidprompt/liquidprompt || \
   try_source "$HOME"/liquidprompt/liquidprompt || \
-  try_source "$HOME"/.bash_prompt
+  try_source "$HOME"/.bash_prompt; }
 
 # Set the default text editor.
 export EDITOR='vi'
@@ -161,12 +170,12 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
     export SSH_ASKPASS="/usr/lib/ssh/x11-ssh-askpass"
 
   # Discover the running ssh-agent
-  export SSH_AGENT_PID=$(pgrep -U $user ssh-agent)
+  export SSH_AGENT_PID=$(pgrep -U "$user" ssh-agent)
 
   # Found a running ssh agent? Link up to it. This is hard...
   if [ -n "$SSH_AGENT_PID" ]; then
     live_socket=0
-    [ -r ${HOME}/.ssh-agent-info ] && \
+    [ -r "${HOME}/.ssh-agent-info" ] && \
       eval $(cat ${HOME}/.ssh-agent-info) > /dev/null && \
       ssh-add -l 2> /dev/null > /dev/null
     live_socket=$?;
@@ -174,15 +183,15 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
     # if live_socket is non-zero, existing agent info file isn't valid and lsof doesn't work (anymore?)
     # Go find it manually
     [ $live_socket -ne 0 ] && \
-      export SSH_AUTH_SOCK=$(ls -lt /tmp/ssh-*/agent.* 2> /dev/null | head -n 1 | grep $user | awk '{print $9}') && \
+      export SSH_AUTH_SOCK=$(ls -lt /tmp/ssh-*/agent.* 2> /dev/null | head -n 1 | grep "$user" | awk '{print $9}') && \
       ssh-add -l 2> /dev/null > /dev/null
     live_socket=$?
 
     # If live socket is still non-zero, we still don't have a live socket and our
     # cheater check didn't work. We'll go to ssh-find-agent, which is slow
     # but pretty thorough
-    [ $live_socket -ne 0 ] && [ -r ${HOME}/.ssh-find-agent.sh ] && \
-      source ${HOME}/.ssh-find-agent.sh && set_ssh_agent_socket
+    [ $live_socket -ne 0 ] && [ -r "${HOME}/.ssh-find-agent.sh" ] && \
+      . "${HOME}/.ssh-find-agent.sh" && set_ssh_agent_socket
     live_socket=$?
 
     # If live socket is still non-zero, we need to just give up
@@ -194,8 +203,8 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
     # easy case - crank an agent up. It's still possible, though unlikely
     # we don't have ssh-agent. We'll save the socket info for later
     command_exists ssh-agent && \
-      ssh-agent -s > ${HOME}/.ssh-agent-info && \
-      eval $(cat ${HOME}/.ssh-agent-info) > /dev/null
+      ssh-agent -s > "${HOME}/.ssh-agent-info" && \
+      eval $(cat "${HOME}/.ssh-agent-info") > /dev/null
   fi
 
   # Add all the local keys, getting the passphrase from keychain,
@@ -205,8 +214,11 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
 fi # SSH section if gpg-agent not available
 
 # Allow Ctrl-S for forward search at the expense of losing terminal stop
-[[ $- = *i* ]] && stty stop ''
+[ $interactive -eq 1 ] && stty stop ''
 
-# Must be performed last
-[ -r ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh ] && \
-  . ${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh
+# Must be performed last. We're using lowercase dash because we don't have
+# a great way to detect "hey, this isn't bash or zsh".
+# TODO: figure out how to detect pure POSIX-ness
+[ $runningshell != other ] && \
+  [ -r "${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh" ] && \
+  . "${HOME}/.oh-my-bash-zsh/oh-my-bash-zsh.sh"
