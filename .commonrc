@@ -106,7 +106,7 @@ command_exists st && export TERMINAL='st'
 [ "$PS2" = "%_> " ] && export PS2="%_⚡ "
 
 [ -r "$HOME"/.LS_COLORS ] && [ ! -r "$HOME"/.dircolors ] && \
-  ln -s "$HOME"/.LS_COLORS/LS_COLORS "$HOME"/.dircolors
+  (cd "$HOME" && ln -s .LS_COLORS/LS_COLORS .dircolors)
 
 [ -r "$HOME"/.dircolors ] && command_exists dircolors && \
   eval $(dircolors -b "$HOME"/.dircolors)
