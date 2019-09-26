@@ -147,7 +147,9 @@ user="${USER:-$(whoami)}"
 if command_exists gpg-agent; then
   # We have gpg-agent, great
   export GPG_TTY=$(tty)
-  if [ -z "$(pgrep -U "$user" gpg-agent)" ]; then
+  # The latter command should only be run on busybox, which does not have -U
+  # If we're running busybox we're probably single user...
+  if [ -z "$(pgrep -U "$user" gpg-agent 2>/dev/null || pgrep gpg-agent)" ]; then
     eval $(gpg-agent --daemon --enable-ssh-support 2> /dev/null)
   fi
   if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
@@ -172,7 +174,7 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
     export SSH_ASKPASS="/usr/lib/ssh/x11-ssh-askpass"
 
   # Discover the running ssh-agent
-  export SSH_AGENT_PID=$(pgrep -U "$user" ssh-agent)
+  export SSH_AGENT_PID=$(pgrep -U "$user" ssh-agent 2>/dev/null || pgrep ssh-agent)
 
   # Found a running ssh agent? Link up to it. This is hard...
   if [ -n "$SSH_AGENT_PID" ]; then
