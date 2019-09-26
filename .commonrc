@@ -16,6 +16,7 @@ try_prepend_path () {
 
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
+export QT_STYLE_OVERRIDE="Adwaita-Dark" # QT5 apps
 export AWS_VAULT_BACKEND=secret-service
 export DOTNET_CLI_TELEMETRY_OPTOUT=1 # Really? We now have to do this???
 
