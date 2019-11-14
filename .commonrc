@@ -103,8 +103,8 @@ interactive=$?
 export EDITOR='vi'
 command_exists vim && export EDITOR='vim'
 command_exists nvim && export EDITOR='nvim'
+export SUDO_EDITOR=$(command -v $EDITOR)
 command_exists st && export TERMINAL='st'
-export SUDO_EDITOR=$EDITOR
 
 [ "$PS2" = "%_> " ] && export PS2="%_⚡ "
 
