@@ -102,6 +102,7 @@ interactive=$?
 # Set the default text editor.
 export EDITOR='vi'
 command_exists vim && export EDITOR='vim'
+command_exists nvim && export EDITOR='nvim'
 command_exists st && export TERMINAL='st'
 export SUDO_EDITOR=$EDITOR
 
