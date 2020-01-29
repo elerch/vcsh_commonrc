@@ -196,6 +196,7 @@ if [ -z "$GPG_TTY" ] && command_exists ssh-agent; then
     # cheater check didn't work. We'll go to ssh-find-agent, which is slow
     # but pretty thorough
     [ $live_socket -ne 0 ] && [ -r "${HOME}/.ssh-find-agent.sh" ] && \
+      [ -r "${HOME}/.ssh/authorized_keys" ] && \
       . "${HOME}/.ssh-find-agent.sh" && set_ssh_agent_socket
     live_socket=$?
 
