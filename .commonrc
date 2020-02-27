@@ -82,6 +82,7 @@ for file in extra exports aliases functions lambdash; do
     try_source "$HOME"/."$file"
 done
 unset file
+[ -r "$HOME"/.functions ] && export BASH_ENV="$HOME"/.functions
 # Determine running shell as bash/zsh/other
 if test -n "${BASH_VERSION-}" -a -n "$PS1" ; then
   runningshell=bash
