@@ -39,6 +39,8 @@ for pathprefix in \
 done
 unset pathprefix
 
+try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
+
 # Set GOPATH environment variable to the Go lang workspace.
 [ -d "$HOME"/Workspace/go-workspace ] && \
   export GOPATH="$HOME"/Workspace/go-workspace
