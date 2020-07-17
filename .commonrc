@@ -40,6 +40,13 @@ unset pathprefix
 
 try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
+# "Fix" locales in nix stuff. Note this will probably break in multiple ways
+# in the future and calls my entire use of nix into question tbh. Refs:
+# https://github.com/NixOS/nixpkgs/issues/21820
+# https://github.com/NixOS/nix/issues/599
+[ -d "$HOME"/.nix-profile ] && [ -r /usr/lib/locale/locale-archive ] && \
+  export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+
 # Set GOPATH environment variable to the Go lang workspace.
 [ -d "$HOME"/Workspace/go-workspace ] && \
   export GOPATH="$HOME"/Workspace/go-workspace
