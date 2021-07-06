@@ -33,7 +33,8 @@ for pathprefix in \
 done
 unset pathprefix
 
-try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
+# Nix doesn't check before just prepending itself to $PATH. :(
+[ -z "$NIX_PATH" ] && try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
 # "Fix" locales in nix stuff. Note this will probably break in multiple ways
 # in the future and calls my entire use of nix into question tbh. Refs:
