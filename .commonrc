@@ -101,6 +101,8 @@ fi
 # Calculate prompt
 echo $- | grep -qv i
 interactive=$?
+# who required for liquidprompt but not in termux
+command_exists who || alias who='echo ""'
 [ $interactive -eq 1 ] && [ $runningshell != other ] && { \
   try_source "$HOME"/.liquidprompt/liquidprompt || \
   try_source "$HOME"/liquidprompt/liquidprompt || \
