@@ -18,6 +18,9 @@ try_prepend_path () {
 ########################################################################
 # Calculate path
 ########################################################################
+
+# Remove $HOME/.local/bin so we can make sure it's added later - in beginning!
+PATH=$(echo $PATH|sed "s@${HOME}/.local/bin:@@")
 # Add ~/bin:/usr/local/sbin:/usr/local/bin to path if they're not there
 for pathprefix in \
   /usr/local/go/bin \
