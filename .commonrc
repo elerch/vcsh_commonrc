@@ -116,8 +116,9 @@ export EDITOR='vi'
 command_exists vim && export EDITOR='vim'
 command_exists nvim && export EDITOR='nvim'
 export SUDO_EDITOR=$(command -v $EDITOR)
-command_exists st && export TERMINAL='st'
 command_exists alacritty && export TERMINAL='alacritty' # Let's try alacritty
+command_exists st && export TERMINAL='st' # prioritize st if available
+command_exists mlterm && export TERMINAL='mlterm' # prioritize mlterm if available
 
 [ "$PS2" = "%_> " ] && export PS2="%_⚡ "
 
