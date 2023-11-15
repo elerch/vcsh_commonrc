@@ -31,6 +31,7 @@ for pathprefix in \
   "$HOME"/.local/dotnet \
   "$HOME"/.dotnet/tools \
   "$HOME"/.cargo/bin \
+  "$HOME"/.nix-flake/local/bin \
   ; do
     try_prepend_path "$pathprefix"
 done
