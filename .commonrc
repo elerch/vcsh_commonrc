@@ -88,7 +88,7 @@ try_prepend_path "$HOME"/.local/bin
 #   .extra should be the last thing that mucks with PATH. The
 #   other sourced files are done after PATH calculation in case
 #   they are dependent on commands
-for file in extra exports aliases functions lambdash; do
+for file in extra exports aliases functions lambdash extraextra; do
     try_source "$HOME"/."$file"
 done
 unset file
