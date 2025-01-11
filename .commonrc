@@ -122,6 +122,7 @@ export SUDO_EDITOR=$(command -v $EDITOR)
 command_exists alacritty && export TERMINAL='alacritty' # Let's try alacritty
 command_exists st && export TERMINAL='st' # prioritize st if available
 command_exists mlterm && export TERMINAL='mlterm' # prioritize mlterm if available
+command_exists ghostty && export TERMINAL='ghostty' # prioritize ghostty if available
 
 [ "$PS2" = "%_> " ] && export PS2="%_⚡ "
 
