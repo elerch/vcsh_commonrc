@@ -40,7 +40,10 @@ done
 unset pathprefix
 
 # Nix doesn't check before just prepending itself to $PATH. :(
-[ -z "$NIX_PATH" ] && try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
+[ -d "$HOME"/.nix-profile/bin ] && \
+  ! echo "$PATH" | grep -Fq "$HOME"/.nix-profile/bin && \
+  [ -z "$NIX_PATH" ] && \
+  try_source "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
 # "Fix" locales in nix stuff. Note this will probably break in multiple ways
 # in the future and calls my entire use of nix into question tbh. Refs:
